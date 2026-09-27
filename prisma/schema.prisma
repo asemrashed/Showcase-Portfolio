@@ -1,0 +1,337 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum UserRole {
+  SUPER_ADMIN
+  ADMIN
+  DEVELOPER
+}
+
+enum ProjectStatus {
+  DRAFT
+  PENDING
+  PUBLISHED
+  ARCHIVED
+}
+
+enum MessageStatus {
+  NEW
+  READ
+  ARCHIVED
+}
+
+enum ImageType {
+  MAIN
+  DESKTOP
+  MOBILE
+  EXTRA
+}
+
+enum ImageDevice {
+  DESKTOP
+  MOBILE
+}
+
+model User {
+  id             String    @id @default(cuid())
+  email          String    @unique
+  name           String?
+  passwordHash   String
+  role           UserRole  @default(DEVELOPER)
+  active         Boolean   @default(true)
+  sessionVersion Int       @default(0)
+  lastLoginAt    DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  projectsCreated Project[]  @relation("ProjectCreatedBy")
+  projectsUpdated Project[]  @relation("ProjectUpdatedBy")
+  projectsPriced  Project[]  @relation("ProjectPriceSetBy")
+  auditLogs       AuditLog[]
+  passwordResets  PasswordResetToken[]
+
+  @@index([role])
+}
+
+model PasswordResetToken {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId])
+}
+
+model Category {
+  id          String    @id @default(cuid())
+  name        String
+  slug        String    @unique
+  description String?
+  imageUrl    String?
+  imageKey    String?
+  imageAlt    String?
+  order       Int       @default(0)
+  deletedAt   DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  projects Project[]
+
+  @@index([order])
+  @@index([deletedAt])
+}
+
+model Project {
+  id               String        @id @default(cuid())
+  slug             String        @unique
+  name             String
+  shortDescription String
+  fullDescription  String        @db.Text
+  status           ProjectStatus @default(DRAFT)
+  featured         Boolean       @default(false)
+  order            Int           @default(0)
+
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+
+  liveUrl String?
+  demoUrl String?
+  repoUrl String?
+
+  // Admin-only fields
+  minPrice    Int?
+  maxPrice    Int?
+  minDuration Int? // days
+  maxDuration Int? // days
+
+  // SEO
+  metaTitle       String?
+  metaDescription String?
+  ogImageUrl      String?
+  ogImageKey      String?
+
+  rejectionNote String?
+  publishedAt   DateTime?
+  deletedAt     DateTime?
+
+  createdById  String?
+  createdBy    User?     @relation("ProjectCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  updatedById  String?
+  updatedBy    User?     @relation("ProjectUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
+  priceSetById String?
+  priceSetBy   User?     @relation("ProjectPriceSetBy", fields: [priceSetById], references: [id], onDelete: SetNull)
+  priceSetAt   DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  roles        ProjectRole[]
+  features     ProjectFeature[]
+  technologies ProjectTechnology[]
+  images       ProjectImage[]
+  reviews      Review[]
+  heroSlides   HeroSlide[]
+
+  @@index([status])
+  @@index([categoryId])
+  @@index([featured])
+  @@index([deletedAt])
+  @@index([createdById])
+  @@index([status, deletedAt, featured])
+}
+
+model ProjectRole {
+  id          String   @id @default(cuid())
+  projectId   String
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  name        String
+  description String?
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+
+  images ProjectRoleImage[]
+
+  @@index([projectId, order])
+}
+
+model ProjectRoleImage {
+  id        String      @id @default(cuid())
+  roleId    String
+  role      ProjectRole @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  url       String
+  key       String
+  alt       String
+  device    ImageDevice
+  order     Int         @default(0)
+  createdAt DateTime    @default(now())
+
+  @@index([roleId, order])
+  @@index([key])
+}
+
+model ProjectFeature {
+  id          String  @id @default(cuid())
+  projectId   String
+  project     Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  title       String
+  description String  @default("")
+  icon        String?
+  order       Int     @default(0)
+
+  @@index([projectId, order])
+}
+
+model ProjectTechnology {
+  id        String  @id @default(cuid())
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  name      String
+  icon      String?
+  order     Int     @default(0)
+
+  @@index([projectId, order])
+}
+
+model ProjectImage {
+  id        String    @id @default(cuid())
+  projectId String
+  project   Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  url       String
+  key       String
+  alt       String
+  type      ImageType
+  order     Int       @default(0)
+  createdAt DateTime  @default(now())
+
+  @@index([projectId, type, order])
+  @@index([key])
+}
+
+model Review {
+  id         String    @id @default(cuid())
+  authorName String
+  authorRole String?
+  company    String?
+  avatarUrl  String?
+  avatarKey  String?
+  rating     Int       @default(5)
+  content    String    @db.Text
+  projectId  String?
+  project    Project?  @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  published  Boolean   @default(false)
+  order      Int       @default(0)
+  deletedAt  DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@index([published, deletedAt])
+  @@index([projectId])
+}
+
+model HeroSlide {
+  id        String   @id @default(cuid())
+  title     String
+  subtitle  String?
+  ctaLabel  String?
+  ctaUrl    String?
+  imageUrl  String
+  imageKey  String
+  imageAlt  String
+  projectId String?
+  project   Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  active    Boolean  @default(true)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([active, order])
+}
+
+/// Singleton (id = "singleton")
+model AboutSection {
+  id          String   @id @default("singleton")
+  title       String
+  description String   @db.Text
+  imageUrl    String?
+  imageKey    String?
+  imageAlt    String?
+  stats       Json     @default("[]") // [{label, value}]
+  skills      Json     @default("[]") // string[]
+  updatedAt   DateTime @updatedAt
+}
+
+/// Singleton (id = "singleton")
+model ContactInfo {
+  id           String   @id @default("singleton")
+  email        String?
+  phone        String?
+  address      String?
+  mapUrl       String?
+  workingHours String?
+  socials      Json     @default("[]") // [{platform, url}]
+  updatedAt    DateTime @updatedAt
+}
+
+model ContactMessage {
+  id        String        @id @default(cuid())
+  name      String
+  email     String
+  subject   String?
+  message   String        @db.Text
+  status    MessageStatus @default(NEW)
+  ip        String?
+  createdAt DateTime      @default(now())
+
+  @@index([status, createdAt])
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  actorId    String?
+  actor      User?    @relation(fields: [actorId], references: [id], onDelete: SetNull)
+  actorEmail String?
+  action     String
+  entity     String
+  entityId   String?
+  meta       Json?
+  createdAt  DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([entity, entityId])
+  @@index([actorId])
+  @@index([action])
+}
+
+/// Singleton (id = "singleton")
+model SiteSettings {
+  id                 String   @id @default("singleton")
+  siteName           String   @default("Project Showcase")
+  tagline            String?
+  logoUrl            String?
+  logoKey            String?
+  defaultOgImageUrl  String?
+  defaultOgImageKey  String?
+  currency           String   @default("USD")
+  footerText         String?
+  contactNotifyEmail String?
+  socials            Json     @default("[]")
+  updatedAt          DateTime @updatedAt
+}
+
+/// Queue of R2 objects to delete (processed after commit + by cron)
+model PendingDeletion {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  attempts  Int      @default(0)
+  createdAt DateTime @default(now())
+}
