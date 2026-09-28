@@ -7,7 +7,7 @@ export function CategoryCard({ category }: { category: CategoryData }) {
   return (
     <Link
       href={`/projects?category=${category.slug}`}
-      className="group relative flex aspect-[4/3] flex-col justify-end overflow-hidden rounded-[var(--radius-xl)] bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
+      className="group relative flex aspect-4/3 flex-col justify-end overflow-hidden rounded-xl bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
     >
       {category.image ? (
         <Image
@@ -18,9 +18,9 @@ export function CategoryCard({ category }: { category: CategoryData }) {
           className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.05]"
         />
       ) : (
-        <div className="absolute inset-0 bg-gradient-to-br from-primary-soft to-muted" />
+        <div className="absolute inset-0 bg-linear-to-br from-primary-soft to-muted" />
       )}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+      <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/10 to-transparent" />
       <div className="relative flex items-end justify-between gap-3 p-5">
         <div>
           <h3 className="text-lg font-medium text-white">{category.name}</h3>

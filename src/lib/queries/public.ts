@@ -19,6 +19,7 @@ const cardSelect = {
   name: true,
   shortDescription: true,
   featured: true,
+  liveUrl: true,
   publishedAt: true,
   category: { select: { id: true, name: true, slug: true } },
   images: { where: { type: "MAIN" }, take: 1, select: { url: true, alt: true } },
@@ -31,6 +32,7 @@ const toCard = (p: Prisma.ProjectGetPayload<{ select: typeof cardSelect }>) => (
   name: p.name,
   shortDescription: p.shortDescription,
   featured: p.featured,
+  liveUrl: p.liveUrl,
   publishedAt: p.publishedAt?.toISOString() ?? null,
   category: p.category,
   image: p.images[0] ?? null,
@@ -151,11 +153,12 @@ const categorySelect = {
 } satisfies Prisma.CategorySelect;
 
 export const getCategories = unstable_cache(
-  async () => {
+  async (limit?: number) => {
     const rows = await db.category.findMany({
       where: { deletedAt: null },
       select: categorySelect,
       orderBy: [{ order: "asc" }, { name: "asc" }],
+      take: limit,
     });
     return rows.map(toCategory);
   },

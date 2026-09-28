@@ -28,8 +28,14 @@ export const metadata: Metadata = {
 export default async function HomePage() {
   const [hero, categories, featured, reviews, about] = await Promise.all([
     load(() => getHero(), []),
-    load(() => getCategories(), []),
-    load(() => getProjects({ page: 1, pageSize: 6, featured: true }), { items: [], page: 1, pageSize: 6, total: 0, totalPages: 1 }),
+    load(() => getCategories(3), []),
+    load(() => getProjects({ page: 1, pageSize: 3 }), {
+     items: [],
+     page: 1,
+     pageSize: 3,
+     total: 0,
+     totalPages: 1,
+    }),
     load(() => getReviews({ limit: 9 }), []),
     load(() => getAbout(), null),
   ]);

@@ -78,7 +78,7 @@ function Slot({ projectId, image, type, label, aspect }: { projectId: string; im
   return (
     <div className="flex flex-col gap-2">
       <span className="text-sm font-medium">{label}</span>
-      <div className={cn("relative flex w-full flex-col items-center justify-center overflow-hidden rounded-[var(--radius-lg)] border border-dashed border-border bg-muted", aspect)}>
+      <div className={cn("relative flex w-full flex-col items-center justify-center overflow-hidden rounded-lg border border-dashed border-border bg-muted", aspect)}>
         {image ? (
           <>
             <Image src={image.url} alt={image.alt} fill sizes="320px" className="object-cover" />
@@ -92,7 +92,7 @@ function Slot({ projectId, image, type, label, aspect }: { projectId: string; im
               {replace.isPending || replaceUrl.isPending || isUploading ? <Loader2 className="size-6 animate-spin" /> : <ImagePlus className="size-6" />}
               {replace.isPending || replaceUrl.isPending || isUploading ? "Saving…" : "Click to upload file"}
             </button>
-            <div className="flex w-full max-w-[240px] items-center gap-2">
+            <div className="flex w-full max-w-60 items-center gap-2">
               <Input
                 value={urlInput}
                 onChange={(e) => setUrlInput(e.target.value)}
@@ -183,7 +183,7 @@ function ExtraGallery({ projectId, images }: { projectId: string; images: Projec
       <span className="text-sm font-medium">Extra screenshots</span>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         {images.map((img, i) => (
-          <div key={img.id} {...handlers(i)} className={cn("relative aspect-[4/3] overflow-hidden rounded-[var(--radius-md)] border border-border bg-muted", dragIndex === i && "opacity-50", overIndex === i && dragIndex !== i && "border-primary")}>
+          <div key={img.id} {...handlers(i)} className={cn("relative aspect-4/3 overflow-hidden rounded-md border border-border bg-muted", dragIndex === i && "opacity-50", overIndex === i && dragIndex !== i && "border-primary")}>
             <Image src={img.url} alt={img.alt} fill sizes="160px" className="object-cover" />
             <span className="absolute left-1.5 top-1.5 flex size-6 cursor-grab items-center justify-center rounded-full bg-black/50 text-white" aria-hidden>
               <GripVertical className="size-3.5" />
@@ -198,7 +198,7 @@ function ExtraGallery({ projectId, images }: { projectId: string; images: Projec
             type="button"
             onClick={() => inputRef.current?.click()}
             disabled={add.isPending || addUrl.isPending || isUploading}
-            className="flex aspect-[4/3] flex-col items-center justify-center gap-1.5 rounded-[var(--radius-md)] border border-dashed border-border text-xs text-muted-foreground hover:text-foreground disabled:cursor-not-allowed"
+            className="flex aspect-4/3 flex-col items-center justify-center gap-1.5 rounded-md border border-dashed border-border text-xs text-muted-foreground hover:text-foreground disabled:cursor-not-allowed"
           >
             {add.isPending || addUrl.isPending || isUploading ? <Loader2 className="size-5 animate-spin" /> : <ImagePlus className="size-5" />}
             Upload file
@@ -230,7 +230,7 @@ function ExtraGallery({ projectId, images }: { projectId: string; images: Projec
 
 export function StepMedia({ projectId, images }: { projectId: string | null; images: ProjectImage[] }) {
   if (!projectId) {
-    return <p className="rounded-[var(--radius-md)] border border-dashed border-border p-6 text-center text-sm text-muted-foreground">Save the Basic step first to unlock media uploads.</p>;
+    return <p className="rounded-md border border-dashed border-border p-6 text-center text-sm text-muted-foreground">Save the Basic step first to unlock media uploads.</p>;
   }
   const main = images.find((i) => i.type === "MAIN");
   const desktop = images.find((i) => i.type === "DESKTOP");

@@ -13,8 +13,8 @@ export function FeaturesGrid({ features }: { features: ProjectDetailData["featur
   return (
     <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
       {features.map((f) => (
-        <div key={f.title} className="flex gap-4 rounded-[var(--radius-lg)] border border-border bg-surface p-5">
-          <span className="flex size-10 shrink-0 items-center justify-center rounded-[var(--radius-md)] bg-primary-soft text-primary-text">
+        <div key={f.title} className="flex gap-4 rounded-lg border border-border bg-surface p-5">
+          <span className="flex size-10 shrink-0 items-center justify-center rounded-md bg-primary-soft text-primary-text">
             <FeatureIcon name={f.icon} />
           </span>
           <div>

@@ -10,6 +10,7 @@ export type Column<T> = {
   key: string;
   header: string;
   className?: string;
+  align?: string;
   render: (row: T) => React.ReactNode;
 };
 
@@ -59,7 +60,7 @@ export function DataTable<T>({
   rowClassName,
 }: Props<T>) {
   return (
-    <div className="overflow-hidden rounded-[var(--radius-lg)] border border-border">
+    <div className="overflow-hidden rounded-lg border border-border">
       <div className="overflow-x-auto thin-scroll">
         <table className="w-full min-w-[640px] border-collapse">
           <thead>
