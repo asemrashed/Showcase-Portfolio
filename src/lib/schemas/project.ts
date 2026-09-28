@@ -43,7 +43,7 @@ const roleInput = z.object({
 });
 const featureInput = z.object({
   title: z.string().trim().min(1).max(80),
-  description: z.string().trim().max(500).default(""),
+  description: z.string().trim().max(500).optional(),
   icon: optionalText(60),
 });
 const techInput = z.object({ name: z.string().trim().min(1).max(40), icon: optionalText(60) });
