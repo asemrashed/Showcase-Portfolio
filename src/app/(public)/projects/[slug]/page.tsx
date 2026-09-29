@@ -25,7 +25,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   const title = project.seo.metaTitle || project.name;
   const description = project.seo.metaDescription || project.shortDescription;
-  const ogImage = project.seo.ogImage || project.images.main?.url;
+  const ogImage = project.seo.ogImage || project.images.desktop?.url;
 
   return {
     title,
@@ -49,7 +49,7 @@ export default async function ProjectPage({ params }: Props) {
     description: project.shortDescription,
     applicationCategory: project.category.name,
     url: `${siteUrl}/projects/${project.slug}`,
-    image: project.images.main?.url,
+    image: project.images.desktop?.url,
     ...(project.pricing
       ? {
           offers: {

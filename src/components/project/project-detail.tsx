@@ -1,10 +1,10 @@
 import Link from "next/link";
 import { Suspense } from "react";
 import { Badge } from "@/components/ui/badge";
+import { TechBadge } from "./tech-badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { MonitorFrame } from "./monitor-frame";
-import { PhoneFrame } from "./phone-frame";
-import { ScreenshotCarousel } from "./screenshot-carousel";
+import { Button } from "@/components/ui/button";
+import { DeviceShowcase } from "./device-showcase";
 import { RoleTabs } from "./role-tabs";
 import { FeaturesGrid } from "./features-grid";
 import { PricingBlock } from "./pricing-block";
@@ -13,10 +13,6 @@ import { ProjectReviews } from "./project-reviews";
 import type { ProjectDetailData } from "@/types/api";
 
 export function ProjectDetail({ project, currency }: { project: ProjectDetailData; currency: string }) {
-  const mobileGallery = [project.images.desktop, project.images.mobile, ...project.images.extra].filter(
-    (i): i is { url: string; alt: string } => !!i,
-  );
-
   return (
     <article className="pb-16 lg:pb-20 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mt-4 sm:mt-6">
       <div className="flex flex-col min-w-0">
@@ -30,42 +26,39 @@ export function ProjectDetail({ project, currency }: { project: ProjectDetailDat
             {project.technologies.length > 0 && (
               <div className="mt-5 flex flex-wrap gap-1.5">
                 {project.technologies.map((t) => (
-                  <Badge key={t.name}>{t.name}</Badge>
+                  <TechBadge key={t.name} name={t.name} icon={t.icon} />
                 ))}
               </div>
             )}
-            {(project.links.live || project.links.demo) && (
+            {(project.links.demo || project.links.live) && (
               <div className="mt-6 flex flex-wrap gap-3">
-                {project.links.live && (
-                  <a href={project.links.live} target="_blank" rel="noopener noreferrer" className="inline-flex h-11 items-center justify-center rounded-[var(--radius-md)] bg-primary px-6 text-sm font-medium text-primary-foreground hover:bg-primary/90">
-                    View live
-                  </a>
-                )}
                 {project.links.demo && (
-                  <a href={project.links.demo} target="_blank" rel="noopener noreferrer" className="inline-flex h-11 items-center justify-center rounded-[var(--radius-md)] border border-border bg-surface px-6 text-sm font-medium hover:bg-muted">
-                    Demo login
-                  </a>
+                  <Button asChild size="lg">
+                    <a href={project.links.demo} target="_blank" rel="noopener noreferrer">
+                      Demo Link
+                    </a>
+                  </Button>
+                )}
+                {project.links.live && (
+                  <Button asChild size="lg" variant="secondary">
+                    <a href={project.links.live} target="_blank" rel="noopener noreferrer">
+                      View live
+                    </a>
+                  </Button>
                 )}
               </div>
             )}
           </header>
 
-          {/* Preview section */}
+          {/* Preview section: full-page desktop + mobile screenshots, scrollable inside device frames */}
           {(project.images.desktop || project.images.mobile) && (
             <section className="mt-10">
-              {/* Desktop: independent-scroll device frames, side by side, generous padding */}
-              <div className="hidden gap-8 rounded-[var(--radius-2xl)] bg-muted p-10 lg:flex lg:items-start lg:justify-center">
-                {project.images.desktop && (
-                  <MonitorFrame src={project.images.desktop.url} alt={project.images.desktop.alt} className="max-w-2xl flex-1" />
-                )}
-                {project.images.mobile && (
-                  <PhoneFrame src={project.images.mobile.url} alt={project.images.mobile.alt} />
-                )}
-              </div>
-              {/* Mobile fallback: segmented gallery */}
-              <div className="lg:hidden">
-                <ScreenshotCarousel images={mobileGallery} />
-              </div>
+              <DeviceShowcase
+                desktop={project.images.desktop ? [project.images.desktop] : []}
+                mobile={project.images.mobile ? [project.images.mobile] : []}
+                priority
+                className="rounded-[var(--radius-2xl)] bg-muted p-4 sm:p-6 lg:p-10"
+              />
             </section>
           )}
 

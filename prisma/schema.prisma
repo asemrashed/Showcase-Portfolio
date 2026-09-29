@@ -28,15 +28,27 @@ enum MessageStatus {
 }
 
 enum ImageType {
-  MAIN
   DESKTOP
   MOBILE
-  EXTRA
 }
 
 enum ImageDevice {
   DESKTOP
   MOBILE
+}
+
+enum TechnologyCategory {
+  FRONTEND_FRAMEWORKS
+  STATE_DATA_FETCHING
+  BACKEND
+  DATABASE_ORM
+  AUTHENTICATION
+  VALIDATION_UTILITIES
+  SERVICES
+  APIS_PAYMENTS
+  INFRASTRUCTURE
+  DEVOPS_TOOLING
+  OTHER
 }
 
 model User {
@@ -70,6 +82,22 @@ model PasswordResetToken {
   createdAt DateTime  @default(now())
 
   @@index([userId])
+}
+
+/// Reusable technology catalog (Next.js, Prisma, ...). Populated once in the dashboard,
+/// then picked per-project in the project editor's Technologies step.
+model Technology {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  icon      String? // lucide icon name, or a logo image URL (uploaded or pasted)
+  iconKey   String? // R2 object key when `icon` is one of our own uploads; null for pasted URLs / lucide names
+  category  TechnologyCategory @default(OTHER)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([order])
+  @@index([category])
 }
 
 model Category {

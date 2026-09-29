@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight } from "lucide-react";
+import { cn } from "@/lib/utils";
 import type { CategoryData } from "@/types/api";
 
 export function CategoryCard({ category }: { category: CategoryData }) {
@@ -36,9 +37,9 @@ export function CategoryCard({ category }: { category: CategoryData }) {
   );
 }
 
-export function CategoryGrid({ categories }: { categories: CategoryData[] }) {
+export function CategoryGrid({ categories, columns = 3 }: { categories: CategoryData[]; columns?: 3 | 4 }) {
   return (
-    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+    <div className={cn("grid grid-cols-1 gap-5 sm:grid-cols-2", columns === 4 ? "lg:grid-cols-4" : "lg:grid-cols-3")}>
       {categories.map((c) => (
         <CategoryCard key={c.id} category={c} />
       ))}

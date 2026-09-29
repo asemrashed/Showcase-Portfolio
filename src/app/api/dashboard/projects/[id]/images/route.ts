@@ -3,7 +3,7 @@ import { addProjectImageAction, reorderProjectImagesAction } from "@/actions/pro
 import { readBody, respond, type RouteCtx } from "@/lib/http";
 
 type C = RouteCtx<{ id: string }>;
-/** Attach an uploaded image: { url, key, alt, type: MAIN|DESKTOP|MOBILE|EXTRA, order? } */
+/** Attach an uploaded image: { url, key, alt, type: DESKTOP|MOBILE, order? } */
 export async function POST(req: NextRequest, { params }: C) {
   return respond(await addProjectImageAction((await params).id, await readBody(req)), 201);
 }

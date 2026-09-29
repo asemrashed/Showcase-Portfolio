@@ -37,7 +37,7 @@ export function StepFeatures({ control, register }: { control: Control<ProjectFo
 
   return (
     <div className="flex flex-col gap-4">
-      <p className="text-sm text-muted-foreground">Highlight what the project can do.</p>
+      <p className="text-sm text-muted-foreground">Highlight what the project can do. Add one at a time, or paste several lines and add them in bulk.</p>
 
       {/* Bulk add: one feature per line (press Enter after each), then click Add all */}
       <div className="flex flex-col gap-3 rounded-[var(--radius-lg)] border border-border p-4">
@@ -67,16 +67,33 @@ export function StepFeatures({ control, register }: { control: Control<ProjectFo
         </div>
       </div>
 
-      {fields.map((field, i) => (
-        <div key={field.id} className="grid grid-cols-1 gap-3 rounded-[var(--radius-lg)] border border-border p-4 sm:grid-cols-[1fr_auto] sm:items-start">
-          <FormField label="Title" htmlFor={`feat-${i}-title`}>
-            <Input id={`feat-${i}-title`} {...register(`features.${i}.title`)} />
-          </FormField>
-          <Button type="button" variant="ghost" size="icon" aria-label="Remove feature" className="mt-6 justify-self-end" onClick={() => remove(i)}>
-            <Trash2 className="size-4" />
-          </Button>
+      {/* Confirmed features: one row per feature, table-style instead of a card each */}
+      {fields.length > 0 && (
+        <div className="overflow-hidden rounded-[var(--radius-lg)] border border-border">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-border bg-muted/50 text-left text-xs font-medium text-muted-foreground">
+                <th className="px-4 py-2.5 font-medium">Title</th>
+                <th className="w-12 px-2 py-2.5" />
+              </tr>
+            </thead>
+            <tbody>
+              {fields.map((field, i) => (
+                <tr key={field.id} className={i > 0 ? "border-t border-border" : undefined}>
+                  <td className="px-4 py-2">
+                    <Input aria-label={`Feature ${i + 1} title`} className="border-transparent bg-transparent px-0 py-1 focus:border-primary focus:bg-surface focus:px-3.5 focus:py-2.5" {...register(`features.${i}.title`)} />
+                  </td>
+                  <td className="px-2 py-2 text-right">
+                    <Button type="button" variant="ghost" size="icon" aria-label="Remove feature" onClick={() => remove(i)}>
+                      <Trash2 className="size-4" />
+                    </Button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
-      ))}
+      )}
 
       <Button type="button" variant="secondary" className="self-start" onClick={() => append({ title: "" })}>
         <Plus className="size-4" />

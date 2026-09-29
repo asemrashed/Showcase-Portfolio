@@ -17,6 +17,7 @@ export const UPLOAD_FOLDERS = [
   "avatars",
   "og",
   "settings",
+  "technologies",
 ] as const;
 
 export const presignSchema = z

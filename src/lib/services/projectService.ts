@@ -57,7 +57,7 @@ function assertAdminFields(actor: Actor, input: ProjectUpdateInput) {
 
 function assertReady(p: ProjectFull) {
   const missing: string[] = [];
-  if (!p.images.some((i) => i.type === "MAIN")) missing.push("main image");
+  if (!p.images.some((i) => i.type === "DESKTOP")) missing.push("desktop image");
   if (p.technologies.length === 0) missing.push("at least one technology");
   if (missing.length) throw validation(`Project is incomplete: add ${missing.join(" and ")}`);
 }
@@ -181,7 +181,7 @@ export async function list(actor: Actor, q: DashboardProjectQuery) {
         publishedAt: true,
         category: { select: { id: true, name: true } },
         createdBy: { select: { id: true, name: true, email: true } },
-        images: { where: { type: "MAIN" }, take: 1, select: { url: true, alt: true } },
+        images: { where: { type: "DESKTOP" }, take: 1, select: { url: true, alt: true } },
       },
     }),
     db.project.count({ where }),
@@ -373,16 +373,13 @@ export async function addImage(actor: Actor, projectId: string, input: ProjectIm
   const p = await load(projectId);
   assertCan(actor, "project:edit", ctx(p));
   uploads.assertAsset(input);
-  const singleton = input.type !== "EXTRA"; // MAIN / DESKTOP / MOBILE hold exactly one image
+  // A project has exactly two images: one DESKTOP and one MOBILE full-page screenshot.
 
   const created = await db.$transaction(async (tx) => {
-    let replaced: string[] = [];
-    if (singleton) {
-      const old = await tx.projectImage.findMany({ where: { projectId, type: input.type } });
-      replaced = old.map((o) => o.key).filter((k) => k !== input.key);
-      await tx.projectImage.deleteMany({ where: { projectId, type: input.type } });
-    }
-    const order = input.order ?? (singleton ? 0 : await tx.projectImage.count({ where: { projectId, type: "EXTRA" } }));
+    const old = await tx.projectImage.findMany({ where: { projectId, type: input.type } });
+    const replaced = old.map((o) => o.key).filter((k) => k !== input.key);
+    await tx.projectImage.deleteMany({ where: { projectId, type: input.type } });
+    const order = input.order ?? 0;
     const img = await tx.projectImage.create({
       data: { projectId, url: input.url, key: input.key, alt: input.alt, type: input.type, order },
     });

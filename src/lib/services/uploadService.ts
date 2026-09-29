@@ -53,6 +53,7 @@ async function isReferenced(key: string) {
     db.review.count({ where: { avatarKey: key } }),
     db.aboutSection.count({ where: { imageKey: key } }),
     db.siteSettings.count({ where: { OR: [{ logoKey: key }, { defaultOgImageKey: key }] } }),
+    db.technology.count({ where: { iconKey: key } }),
   ]);
   return counts.some((c) => c > 0);
 }

@@ -1,5 +1,6 @@
 import type * as projectService from "@/lib/services/projectService";
 import type * as categoryService from "@/lib/services/categoryService";
+import type * as technologyService from "@/lib/services/technologyService";
 import type * as heroService from "@/lib/services/heroService";
 import type * as reviewService from "@/lib/services/reviewService";
 import type * as userService from "@/lib/services/userService";
@@ -14,6 +15,7 @@ export type DashboardProjectRow = DashboardProjectsPage["items"][number];
 export type DashboardProjectFull = Awaited<ReturnType<typeof projectService.get>>;
 
 export type DashboardCategory = Awaited<ReturnType<typeof categoryService.list>>[number];
+export type DashboardTechnology = Awaited<ReturnType<typeof technologyService.list>>[number];
 export type DashboardHeroSlide = Awaited<ReturnType<typeof heroService.list>>[number];
 export type DashboardReview = Awaited<ReturnType<typeof reviewService.list>>[number];
 

@@ -3,6 +3,7 @@ import type {
   DashboardProjectsPage,
   DashboardProjectFull,
   DashboardCategory,
+  DashboardTechnology,
   DashboardHeroSlide,
   DashboardReview,
   DashboardUsersPage,
@@ -38,6 +39,9 @@ export const dashboardApi = {
   categories: () => request<DashboardCategory[]>("/api/dashboard/categories"),
   category: (id: string) => request<DashboardCategory>(`/api/dashboard/categories/${id}`),
 
+  technologies: () => request<DashboardTechnology[]>("/api/dashboard/technologies"),
+  technology: (id: string) => request<DashboardTechnology>(`/api/dashboard/technologies/${id}`),
+
   heroSlides: () => request<DashboardHeroSlide[]>("/api/dashboard/hero"),
 
   reviews: () => request<DashboardReview[]>("/api/dashboard/reviews"),
@@ -60,6 +64,7 @@ export const dqk = {
   projects: (p: DashboardProjectsParams) => ["dashboard", "projects", p] as const,
   project: (id: string) => ["dashboard", "projects", id] as const,
   categories: ["dashboard", "categories"] as const,
+  technologies: ["dashboard", "technologies"] as const,
   hero: ["dashboard", "hero"] as const,
   reviews: ["dashboard", "reviews"] as const,
   users: (p: DashboardUsersParams) => ["dashboard", "users", p] as const,

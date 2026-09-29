@@ -46,7 +46,8 @@ const featureInput = z.object({
   description: z.string().trim().max(500).optional(),
   icon: optionalText(60),
 });
-const techInput = z.object({ name: z.string().trim().min(1).max(40), icon: optionalText(60) });
+// icon may be a lucide name or a full logo image URL snapshotted from the technology catalog
+const techInput = z.object({ name: z.string().trim().min(1).max(40), icon: optionalText(2048) });
 
 const shape = {
   name: z.string().trim().min(2).max(120),
@@ -83,7 +84,7 @@ export const projectPublishSchema = z.object(pricingShape).strict().superRefine(
 export const projectRejectSchema = z.object({ note: z.string().trim().min(3).max(500) }).strict();
 
 export const projectImageCreateSchema = imageRefSchema.extend({
-  type: z.enum(["MAIN", "DESKTOP", "MOBILE", "EXTRA"]),
+  type: z.enum(["DESKTOP", "MOBILE"]),
   order: orderSchema.optional(),
 });
 export const projectImageReorderSchema = reorderSchema;

@@ -16,6 +16,7 @@ export type Action =
   | "project:reject"
   | "project:archive"
   | "category:manage"
+  | "technology:manage"
   | "hero:manage"
   | "review:manage"
   | "about:manage"
@@ -29,7 +30,8 @@ export type Action =
 /** Actions a DEVELOPER may only perform on projects they own. */
 const OWNER_SCOPED: readonly Action[] = ["project:read", "project:edit", "project:submit", "project:delete"];
 
-const DEVELOPER = new Set<Action>(["project:create", "upload:presign", ...OWNER_SCOPED]);
+// Every project has its own tech stack, so all three roles can maintain the shared technology catalog.
+const DEVELOPER = new Set<Action>(["project:create", "upload:presign", "technology:manage", ...OWNER_SCOPED]);
 const ADMIN = new Set<Action>([
   ...DEVELOPER,
   "project:list:all",

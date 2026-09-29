@@ -11,9 +11,9 @@ export function StickyProjectCard({ project, currency }: { project: ProjectDetai
       {/* Desktop: sticky right column */}
       <div className="hidden lg:block">
         <div className="sticky top-24 overflow-hidden rounded-[var(--radius-xl)] border border-border bg-surface">
-          {project.images.main && (
+          {project.images.desktop && (
             <div className="relative aspect-[4/3] w-full bg-muted">
-              <Image src={project.images.main.url} alt={project.images.main.alt} fill sizes="320px" className="object-cover" />
+              <Image src={project.images.desktop.url} alt={project.images.desktop.alt} fill sizes="320px" className="object-cover object-top" />
             </div>
           )}
           <div className="p-5">
@@ -32,8 +32,8 @@ export function StickyProjectCard({ project, currency }: { project: ProjectDetai
             )}
             {hasLinks && (
               <div className="mt-5 flex flex-col gap-2">
-                {project.links.live && <LinkButton href={project.links.live} label="View live" icon={ExternalLink} primary />}
-                {project.links.demo && <LinkButton href={project.links.demo} label="Demo login" icon={PlayCircle} />}
+                {project.links.demo && <LinkButton href={project.links.demo} label="Demo Link" icon={PlayCircle} primary />}
+                {project.links.live && <LinkButton href={project.links.live} label="View live" icon={ExternalLink} />}
               </div>
             )}
           </div>
@@ -47,10 +47,10 @@ export function StickyProjectCard({ project, currency }: { project: ProjectDetai
           style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom, 0px))" }}
         >
           {project.links.demo && (
-            <LinkButton href={project.links.demo} label="Demo login" icon={PlayCircle} className="flex-1" />
+            <LinkButton href={project.links.demo} label="Demo Link" icon={PlayCircle} primary className="flex-1" />
           )}
           {project.links.live && (
-            <LinkButton href={project.links.live} label="View live" icon={ExternalLink} primary className="flex-1" />
+            <LinkButton href={project.links.live} label="View live" icon={ExternalLink} className="flex-1" />
           )}
         </div>
       )}

@@ -28,7 +28,7 @@ export const metadata: Metadata = {
 export default async function HomePage() {
   const [hero, categories, featured, reviews, about] = await Promise.all([
     load(() => getHero(), []),
-    load(() => getCategories(3), []),
+    load(() => getCategories(4), []),
     load(() => getProjects({ page: 1, pageSize: 3 }), {
      items: [],
      page: 1,
@@ -46,9 +46,17 @@ export default async function HomePage() {
 
       {categories.length > 0 && (
         <Section>
-          <SectionHeading eyebrow="Categories" title="Explore by category" description="Every project sorted into the kind of work it is." />
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <SectionHeading eyebrow="Categories" title="Explore by category" description="Every project sorted into the kind of work it is." />
+            <Button asChild variant="ghostPrimary">
+              <Link href="/categories">
+                View all
+                <ArrowRight className="size-4" />
+              </Link>
+            </Button>
+          </div>
           <div className="mt-10">
-            <CategoryGrid categories={categories.slice(0, 6)} />
+            <CategoryGrid categories={categories.slice(0, 4)} columns={4} />
           </div>
         </Section>
       )}
@@ -56,7 +64,7 @@ export default async function HomePage() {
       <Section className="border-t border-border">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <SectionHeading eyebrow="Selected work" title="Featured projects" />
-          <Button asChild variant="ghost">
+          <Button asChild variant="ghostPrimary">
             <Link href="/projects">
               View all
               <ArrowRight className="size-4" />

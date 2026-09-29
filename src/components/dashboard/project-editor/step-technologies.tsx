@@ -1,88 +1,140 @@
 "use client";
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import Link from "next/link";
+import { useQuery } from "@tanstack/react-query";
 import { useFieldArray, useWatch, type Control, type UseFormRegister } from "react-hook-form";
-import { Plus, Trash2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input, FormField } from "@/components/ui/input";
+import { Check, ExternalLink, Search } from "lucide-react";
+import { dashboardApi, dqk } from "@/lib/api/dashboard";
+import { TECHNOLOGY_CATEGORIES, TECHNOLOGY_CATEGORY_LABELS, type TechnologyCategoryValue } from "@/lib/schemas/technology";
+import { Input } from "@/components/ui/input";
+import { Select } from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
 import type { ProjectFormValues } from "./types";
 
-const MAX_LENGTH = 100;
-
-/** Splits on newlines and commas (tech names rarely contain commas), de-dupes case-insensitively. */
-function parseNames(raw: string, existing: string[]): string[] {
-  const seen = new Set(existing.map((v) => v.trim().toLowerCase()));
-  const result: string[] = [];
-  for (const part of raw.split(/[\n,]/)) {
-    const value = part.trim().slice(0, MAX_LENGTH);
-    const key = value.toLowerCase();
-    if (!value || seen.has(key)) continue;
-    seen.add(key);
-    result.push(value);
-  }
-  return result;
-}
-
-export function StepTechnologies({ control, register }: { control: Control<ProjectFormValues>; register: UseFormRegister<ProjectFormValues> }) {
+/**
+ * Technologies are picked from the shared catalog (managed once under Dashboard → Technologies)
+ * instead of being typed out per project. Selecting a row snapshots its current name + icon into
+ * this project's technologies list; later renames in the catalog won't retroactively change it.
+ */
+export function StepTechnologies({ control, register: _register }: { control: Control<ProjectFormValues>; register: UseFormRegister<ProjectFormValues> }) {
+  const { data: catalog, isLoading } = useQuery({ queryKey: dqk.technologies, queryFn: dashboardApi.technologies });
   const { fields, append, remove } = useFieldArray({ control, name: "technologies" });
-  const [bulkText, setBulkText] = useState("");
+  const [search, setSearch] = useState("");
+  const [category, setCategory] = useState<TechnologyCategoryValue | "">("");
 
-  const current = useWatch({ control, name: "technologies" }) ?? [];
-  const pending = parseNames(bulkText, current.map((t) => t?.name ?? ""));
+  const selected = useWatch({ control, name: "technologies" }) ?? [];
+  const selectedNames = new Set(selected.map((t) => t?.name?.trim().toLowerCase()).filter(Boolean));
 
-  const addBulk = () => {
-    if (pending.length === 0) return;
-    append(pending.map((name) => ({ name, icon: "" })));
-    setBulkText("");
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    let list = catalog ?? [];
+    if (category) list = list.filter((t) => t.category === category);
+    if (q) list = list.filter((t) => t.name.toLowerCase().includes(q));
+    return list;
+  }, [catalog, search, category]);
+
+  // Group filtered results by category, in the catalog's fixed category order, skipping empty groups.
+  const groups = useMemo(
+    () =>
+      TECHNOLOGY_CATEGORIES.map((cat) => ({
+        cat,
+        label: TECHNOLOGY_CATEGORY_LABELS[cat],
+        items: filtered.filter((t) => t.category === cat),
+      })).filter((g) => g.items.length > 0),
+    [filtered],
+  );
+
+  const toggle = (name: string, icon: string | null) => {
+    const key = name.trim().toLowerCase();
+    const existingIndex = fields.findIndex((f, i) => (selected[i]?.name ?? f.name)?.trim().toLowerCase() === key);
+    if (existingIndex >= 0) remove(existingIndex);
+    else append({ name, icon: icon ?? "" });
   };
 
   return (
     <div className="flex flex-col gap-4">
-      <p className="text-sm text-muted-foreground">Add the stack in bulk first, then set an icon on any item if you want one.</p>
-
-      <div className="flex flex-col gap-3 rounded-[var(--radius-lg)] border border-border p-4">
-        <FormField label="Add multiple technologies" htmlFor="tech-bulk">
-          <textarea
-            id="tech-bulk"
-            rows={5}
-            value={bulkText}
-            onChange={(e) => setBulkText(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
-                e.preventDefault();
-                addBulk();
-              }
-            }}
-            placeholder={"Next.js\nPrisma\nPostgreSQL"}
-            className="w-full resize-y rounded-[var(--radius-md)] border border-border bg-surface px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
-          />
-        </FormField>
-        <div className="flex items-center justify-between gap-3">
-          <span className="text-xs text-muted-foreground">One per line (commas work too). Ctrl/Cmd + Enter to add.</span>
-          <Button type="button" variant="secondary" disabled={pending.length === 0} onClick={addBulk}>
-            <Plus className="size-4" />
-            {pending.length > 0 ? `Add ${pending.length} technologies` : "Add all"}
-          </Button>
-        </div>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <p className="text-sm text-muted-foreground">Select every technology this project uses. Selected items keep their order below.</p>
+        <Link href="/dashboard/technologies" target="_blank" className="inline-flex shrink-0 items-center gap-1.5 text-xs font-medium text-primary-text hover:underline">
+          Manage catalog
+          <ExternalLink className="size-3.5" />
+        </Link>
       </div>
 
-      {fields.map((field, i) => (
-        <div key={field.id} className="grid grid-cols-1 gap-3 rounded-[var(--radius-lg)] border border-border p-4 sm:grid-cols-[1fr_180px_auto] sm:items-start">
-          <FormField label="Name" htmlFor={`tech-${i}-name`}>
-            <Input id={`tech-${i}-name`} {...register(`technologies.${i}.name`)} />
-          </FormField>
-          <FormField label="Icon" htmlFor={`tech-${i}-icon`} optional>
-            <Input id={`tech-${i}-icon`} placeholder="Sparkle" {...register(`technologies.${i}.icon`)} />
-          </FormField>
-          <Button type="button" variant="ghost" size="icon" aria-label="Remove technology" className="mt-6 justify-self-end" onClick={() => remove(i)}>
-            <Trash2 className="size-4" />
-          </Button>
+      <div className="flex flex-col gap-2 sm:flex-row">
+        <div className="relative flex-1">
+          <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+          <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search technologies..." className="pl-9" />
         </div>
-      ))}
+        <Select value={category} onChange={(e) => setCategory(e.target.value as TechnologyCategoryValue | "")} className="sm:w-56" aria-label="Filter by category">
+          <option value="">All categories</option>
+          {TECHNOLOGY_CATEGORIES.map((cat) => (
+            <option key={cat} value={cat}>
+              {TECHNOLOGY_CATEGORY_LABELS[cat]}
+            </option>
+          ))}
+        </Select>
+      </div>
 
-      <Button type="button" variant="secondary" className="self-start" onClick={() => append({ name: "", icon: "" })}>
-        <Plus className="size-4" />
-        Add technology
-      </Button>
+      {isLoading ? (
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <Skeleton key={i} className="h-10 w-full" />
+          ))}
+        </div>
+      ) : !catalog || catalog.length === 0 ? (
+        <p className="rounded-md border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
+          No technologies in the catalog yet.{" "}
+          <Link href="/dashboard/technologies" target="_blank" className="font-medium text-primary-text hover:underline">
+            Add some
+          </Link>{" "}
+          — you only need to do it once, then reuse them on every project.
+        </p>
+      ) : groups.length === 0 ? (
+        <p className="rounded-md border border-dashed border-border p-6 text-center text-sm text-muted-foreground">No match for the current search / filter.</p>
+      ) : (
+        <div className="flex flex-col gap-5">
+          {groups.map((g) => (
+            <div key={g.cat} className="flex flex-col gap-2">
+              <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{g.label}</h3>
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                {g.items.map((t) => {
+                  const isSelected = selectedNames.has(t.name.trim().toLowerCase());
+                  return (
+                    <button
+                      key={t.id}
+                      type="button"
+                      onClick={() => toggle(t.name, t.icon)}
+                      aria-pressed={isSelected}
+                      className={cn(
+                        "flex cursor-pointer items-center justify-between gap-2 rounded-[var(--radius-md)] border px-3 py-2 text-left text-sm transition-colors",
+                        isSelected ? "border-primary bg-primary-soft text-primary-text" : "border-border hover:bg-muted",
+                      )}
+                    >
+                      <span className="truncate">{t.name}</span>
+                      {isSelected && <Check className="size-4 shrink-0" />}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {fields.length > 0 && (
+        <div className="mt-2 flex flex-wrap gap-2 border-t border-border pt-4">
+          {fields.map((field, i) => (
+            <span key={field.id} className="inline-flex items-center gap-1.5 rounded-full bg-muted px-3 py-1 text-xs font-medium">
+              {selected[i]?.name ?? field.name}
+              <button type="button" aria-label={`Remove ${selected[i]?.name ?? field.name}`} onClick={() => remove(i)} className="cursor-pointer text-muted-foreground hover:text-foreground">
+                ×
+              </button>
+            </span>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

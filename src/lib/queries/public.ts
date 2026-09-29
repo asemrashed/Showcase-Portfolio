@@ -19,10 +19,10 @@ const cardSelect = {
   name: true,
   shortDescription: true,
   featured: true,
-  liveUrl: true,
+  demoUrl: true,
   publishedAt: true,
   category: { select: { id: true, name: true, slug: true } },
-  images: { where: { type: "MAIN" }, take: 1, select: { url: true, alt: true } },
+  images: { where: { type: "DESKTOP" }, take: 1, select: { url: true, alt: true } },
   technologies: { orderBy: { order: "asc" }, take: 6, select: { name: true, icon: true } },
 } satisfies Prisma.ProjectSelect;
 
@@ -32,7 +32,7 @@ const toCard = (p: Prisma.ProjectGetPayload<{ select: typeof cardSelect }>) => (
   name: p.name,
   shortDescription: p.shortDescription,
   featured: p.featured,
-  liveUrl: p.liveUrl,
+  demoUrl: p.demoUrl,
   publishedAt: p.publishedAt?.toISOString() ?? null,
   category: p.category,
   image: p.images[0] ?? null,
@@ -85,7 +85,7 @@ export const getProjectBySlug = unstable_cache(
       include: detailInclude,
     });
     if (!p) return null;
-    const img = (t: "MAIN" | "DESKTOP" | "MOBILE") => {
+    const img = (t: "DESKTOP" | "MOBILE") => {
       const i = p.images.find((x) => x.type === t);
       return i ? { url: i.url, alt: i.alt } : null;
     };
@@ -99,10 +99,8 @@ export const getProjectBySlug = unstable_cache(
       featured: p.featured,
       category: p.category,
       images: {
-        main: img("MAIN"),
         desktop: img("DESKTOP"),
         mobile: img("MOBILE"),
-        extra: p.images.filter((i) => i.type === "EXTRA").map((i) => ({ url: i.url, alt: i.alt })),
       },
       technologies: p.technologies.map((t) => ({ name: t.name, icon: t.icon })),
       features: p.features.map((f) => ({ title: f.title, description: f.description, icon: f.icon })),

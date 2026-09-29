@@ -11,8 +11,8 @@ import { cn } from "@/lib/utils";
 import type { HeroSlideData } from "@/types/api";
 
 export function HeroCarousel({ slides }: { slides: HeroSlideData[] }) {
-  const [autoplay] = useState(() => Autoplay({ delay: 6000, stopOnInteraction: true, stopOnMouseEnter: true }));
-  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: slides.length > 1 }, [autoplay]);
+  const [autoplay] = useState(() => Autoplay({ delay: 5000, stopOnInteraction: false, stopOnMouseEnter: true }));
+  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: slides.length > 1 }, slides.length > 1 ? [autoplay] : []);
   const [selected, setSelected] = useState(0);
 
   useEffect(() => {
@@ -76,7 +76,7 @@ export function HeroCarousel({ slides }: { slides: HeroSlideData[] }) {
       </div>
 
       {slides.length > 1 && (
-        <div className="pointer-events-none absolute inset-x-0 bottom-8 flex items-center justify-center gap-4 sm:justify-start sm:pl-8 lg:pl-[calc((100vw-72rem)/2+2rem)]">
+        <div className="pointer-events-none absolute inset-x-0 bottom-6 flex items-center justify-center sm:bottom-8">
           <div className="pointer-events-auto flex items-center gap-2">
             <button
               type="button"

@@ -4,14 +4,9 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { ArrowUpRight, ExternalLink } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { TechBadge } from "./tech-badge";
 import type { ProjectCardData } from "@/types/api";
-
-/**
- * NOTE ON TYPES: this assumes `ProjectCardData` exposes an optional `liveUrl`
- * (the deployed/demo link). If your type uses a different field name
- * (e.g. `demoUrl`, `url`), rename the reference below — happy to wire it up
- * once I know the real field.
- */
 
 // Tech badges: keep everything on a single row and roll the overflow into
 // a "+N more" chip instead of wrapping, per design spec.
@@ -44,9 +39,7 @@ export function ProjectCard({ project }: { project: ProjectCardData }) {
         onMouseEnter={() => router.prefetch(detailsHref)}
         className="flex flex-col gap-3.5 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
       >
-        {/* 16:9 frame so a full-size PC screenshot fits its native ratio. We use
-            object-contain (not cover) so the entire screenshot is always visible —
-            letterboxing is intentional here, not a bug. */}
+        {/* 16:9 frame. The desktop screenshot is a full-page capture, so we crop to its top (object-top). */}
         <div className="relative aspect-video w-full overflow-hidden rounded-md bg-muted">
           {project.image ? (
             <Image
@@ -54,7 +47,7 @@ export function ProjectCard({ project }: { project: ProjectCardData }) {
               alt={project.image.alt}
               fill
               sizes="(min-width: 1024px) 360px, (min-width: 640px) 45vw, 90vw"
-              className="object-contain transition-transform duration-500 ease-out group-hover:scale-[1.02]"
+              className="object-cover object-top transition-transform duration-500 ease-out group-hover:scale-[1.02]"
             />
           ) : (
             <div className="flex size-full items-center justify-center text-sm text-muted-foreground">No preview</div>
@@ -77,9 +70,7 @@ export function ProjectCard({ project }: { project: ProjectCardData }) {
           {project.technologies.length > 0 && (
             <div className="mt-1 flex flex-nowrap items-center gap-1.5 overflow-hidden">
               {visibleTechnologies.map((t) => (
-                <Badge key={t.name} className="shrink-0">
-                  {t.name}
-                </Badge>
+                <TechBadge key={t.name} name={t.name} icon={t.icon} className="shrink-0" />
               ))}
               {hiddenTechnologiesCount > 0 && (
                 <Badge
@@ -97,34 +88,25 @@ export function ProjectCard({ project }: { project: ProjectCardData }) {
       {/* Footer actions sit outside the details Link so "Visit" can safely be its
           own <a> without producing nested interactive elements. */}
       <div className="mt-1 flex items-center gap-2">
-        <Link
-          href={detailsHref}
-          onMouseEnter={() => router.prefetch(detailsHref)}
-          className="inline-flex flex-1 items-center justify-center rounded-md border border-border bg-surface px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
-        >
-          View details
-        </Link>
-        {project.liveUrl ? (
-          <a
-            href={project.liveUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            // Prevent the outer card's hover/focus affordances from implying this
-            // click also opens the details view — it's a distinct destination.
-            onClick={(e) => e.stopPropagation()}
-            className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-md bg-foreground px-3 py-2 text-sm font-medium text-background transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
-          >
-            Visit
-            <ExternalLink className="size-3.5" />
-          </a>
+        <Button asChild variant="secondary" className="flex-1">
+          <Link href={detailsHref} onMouseEnter={() => router.prefetch(detailsHref)}>
+            View details
+          </Link>
+        </Button>
+        {project.demoUrl ? (
+          <Button asChild className="flex-1">
+            <a href={project.demoUrl} target="_blank" rel="noopener noreferrer">
+              Visit
+              <ExternalLink />
+            </a>
+          </Button>
         ) : (
-          <span
-            aria-disabled="true"
-            title="Live link not available"
-            className="inline-flex flex-1 cursor-not-allowed items-center justify-center gap-1.5 rounded-md bg-muted px-3 py-2 text-sm font-medium text-muted-foreground"
-          >
-            Visit
-            <ExternalLink className="size-3.5" />
+          // Wrapper carries the not-allowed cursor: the disabled button itself ignores pointer events.
+          <span className="flex-1 cursor-not-allowed" title="Demo link not available">
+            <Button disabled className="w-full">
+              Visit
+              <ExternalLink />
+            </Button>
           </span>
         )}
       </div>
