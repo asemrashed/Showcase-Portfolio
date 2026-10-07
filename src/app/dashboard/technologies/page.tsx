@@ -2,7 +2,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { formResolver } from "@/lib/form-resolver";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Plus, Pencil, Trash2, Cpu } from "lucide-react";
@@ -193,7 +193,7 @@ function TechnologyFormModal({
     setValue,
     formState: { errors, isSubmitting },
   } = useForm<TechnologyInput>({
-    resolver: zodResolver(technologySchema),
+    resolver: formResolver<TechnologyInput>(technologySchema),
     defaultValues: {
       name: technology?.name ?? "",
       icon: technology?.icon ?? "",
