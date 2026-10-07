@@ -52,7 +52,7 @@ function toFormValues(p: NonNullable<DashboardProjectFull> | null): Partial<Proj
     metaDescription: p.metaDescription ?? "",
     ogImage: p.ogImageUrl ? { url: p.ogImageUrl, key: p.ogImageKey! } : null,
     roles: p.roles.map((r) => ({ name: r.name, description: r.description ?? "", images: r.images.map((im) => ({ url: im.url, key: im.key, alt: im.alt, device: im.device })) })),
-    features: p.features.map((f) => ({ title: f.title, description: f.description, icon: f.icon })),
+    features: p.features.map((f) => ({ groupName: f.groupName ?? "", title: f.title, description: f.description, icon: f.icon })),
     technologies: p.technologies.map((t) => ({ name: t.name, icon: t.icon })),
     minPrice: p.minPrice ?? undefined,
     maxPrice: p.maxPrice ?? undefined,
@@ -86,8 +86,23 @@ export function ProjectEditor({ projectId, project, role }: { projectId: string 
     router.refresh();
   };
 
+  const sanitizeData = (data: ProjectFormValues): ProjectFormValues => {
+    return {
+      ...data,
+      features: (data.features ?? [])
+        .map((f) => ({
+          title: f.title?.trim() ?? "",
+          groupName: f.groupName?.trim() || null,
+          description: f.description?.trim() || "",
+          icon: f.icon || null,
+        }))
+        .filter((f) => f.title.length > 0),
+    };
+  };
+
   const saveMutation = useMutation({
-    mutationFn: async (data: ProjectFormValues) => {
+    mutationFn: async (raw: ProjectFormValues) => {
+      const data = sanitizeData(raw);
       if (projectId) return unwrap(await updateProjectAction(projectId, data));
       return unwrap(await createProjectAction(data));
     },
@@ -96,13 +111,22 @@ export function ProjectEditor({ projectId, project, role }: { projectId: string 
       invalidate();
       if (!projectId) router.push(`/dashboard/projects/${saved.id}/edit`);
     },
-    onError: (e) => toast.error(e instanceof ApiError ? e.message : "Couldn't save project"),
+    onError: (e) => {
+      if (e instanceof ApiError && e.fieldErrors) {
+        const details = Object.entries(e.fieldErrors)
+          .map(([field, errs]) => `${field}: ${errs.join(", ")}`)
+          .join(" | ");
+        toast.error(`${e.message} — ${details}`);
+      } else {
+        toast.error(e instanceof ApiError ? e.message : "Couldn't save project");
+      }
+    },
   });
 
   const submitMutation = useMutation({
     mutationFn: async () => {
       if (!projectId) throw new Error("Save the project first");
-      await unwrap(await updateProjectAction(projectId, watch()));
+      await unwrap(await updateProjectAction(projectId, sanitizeData(watch())));
       return unwrap(await submitProjectAction(projectId));
     },
     onSuccess: () => {
@@ -115,7 +139,7 @@ export function ProjectEditor({ projectId, project, role }: { projectId: string 
   const publishMutation = useMutation({
     mutationFn: async (data: ProjectFormValues) => {
       if (!projectId) throw new Error("Save the project first");
-      await unwrap(await updateProjectAction(projectId, data));
+      await unwrap(await updateProjectAction(projectId, sanitizeData(data)));
       return unwrap(
         await publishProjectAction(projectId, {
           minPrice: data.minPrice,
@@ -228,7 +252,7 @@ export function ProjectEditor({ projectId, project, role }: { projectId: string 
       </div>
 
       <Card className="p-6">
-        {step === "Basic" && <StepBasic register={register} errors={errors} />}
+        {step === "Basic" && <StepBasic register={register} control={control} errors={errors} />}
         {step === "Media" && <StepMedia projectId={projectId} images={project?.images ?? []} />}
         {step === "Roles" && <StepRoles control={control} register={register} />}
         {step === "Features" && <StepFeatures control={control} register={register} />}

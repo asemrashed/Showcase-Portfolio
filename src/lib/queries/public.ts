@@ -103,7 +103,7 @@ export const getProjectBySlug = unstable_cache(
         mobile: img("MOBILE"),
       },
       technologies: p.technologies.map((t) => ({ name: t.name, icon: t.icon })),
-      features: p.features.map((f) => ({ title: f.title, description: f.description, icon: f.icon })),
+      features: p.features.map((f) => ({ groupName: f.groupName ?? null, title: f.title, description: f.description, icon: f.icon })),
       roles: p.roles.map((r) => ({
         id: r.id,
         name: r.name,

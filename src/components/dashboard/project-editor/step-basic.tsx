@@ -1,12 +1,21 @@
 "use client";
-import type { UseFormRegister, FieldErrors } from "react-hook-form";
+import { Controller, type UseFormRegister, type Control, type FieldErrors } from "react-hook-form";
 import { useQuery } from "@tanstack/react-query";
 import { dashboardApi, dqk } from "@/lib/api/dashboard";
 import { Input, Textarea, FormField } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
+import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import type { ProjectFormValues } from "./types";
 
-export function StepBasic({ register, errors }: { register: UseFormRegister<ProjectFormValues>; errors: FieldErrors<ProjectFormValues> }) {
+export function StepBasic({
+  register,
+  control,
+  errors,
+}: {
+  register: UseFormRegister<ProjectFormValues>;
+  control: Control<ProjectFormValues>;
+  errors: FieldErrors<ProjectFormValues>;
+}) {
   const { data: categories } = useQuery({ queryKey: dqk.categories, queryFn: dashboardApi.categories });
 
   return (
@@ -32,7 +41,18 @@ export function StepBasic({ register, errors }: { register: UseFormRegister<Proj
         <p className="mt-1 text-xs text-muted-foreground">Shown on project cards. 10–300 characters.</p>
       </FormField>
       <FormField label="Full description" htmlFor="p-full" error={errors.fullDescription?.message as string | undefined}>
-        <Textarea id="p-full" rows={10} required {...register("fullDescription")} />
+        <Controller
+          control={control}
+          name="fullDescription"
+          render={({ field }) => (
+            <RichTextEditor
+              value={field.value || ""}
+              onChange={field.onChange}
+              placeholder="Detailed description of the project, architecture, features, etc."
+            />
+          )}
+        />
+        <p className="mt-1 text-xs text-muted-foreground">Use the toolbar to format headings (H2/H3), bold, italic, links, lists, and quotes.</p>
       </FormField>
     </div>
   );

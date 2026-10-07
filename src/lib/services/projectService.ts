@@ -127,7 +127,7 @@ async function writeChildren(tx: Prisma.TransactionClient, projectId: string, i:
   if (i.features) {
     await tx.projectFeature.deleteMany({ where: { projectId } });
     await tx.projectFeature.createMany({
-      data: i.features.map((f, idx) => ({ projectId, title: f.title, description: f.description, icon: f.icon ?? null, order: idx })),
+      data: i.features.map((f, idx) => ({ projectId, groupName: f.groupName ?? null, title: f.title, description: f.description, icon: f.icon ?? null, order: idx })),
     });
   }
   if (i.technologies) {

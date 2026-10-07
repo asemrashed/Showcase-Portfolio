@@ -12,7 +12,7 @@ export type ProjectFormValues = z.infer<typeof projectUpdateSchema>;
 
 export type RoleImage = { url: string; key: string; alt: string; device: "DESKTOP" | "MOBILE" };
 export type RoleValue = { name: string; description: string; images: RoleImage[] };
-export type FeatureValue = { title: string; description: string; icon: string | null };
+export type FeatureValue = { groupName?: string | null; title: string; description?: string; icon?: string | null };
 export type TechValue = { name: string; icon: string | null };
 
 export const STEP_LABELS = ["Basic", "Media", "Roles", "Features", "Technologies", "Links", "SEO"] as const;

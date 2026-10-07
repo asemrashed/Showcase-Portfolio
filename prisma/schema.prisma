@@ -211,6 +211,7 @@ model ProjectFeature {
   id          String  @id @default(cuid())
   projectId   String
   project     Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  groupName   String?
   title       String
   description String  @default("")
   icon        String?

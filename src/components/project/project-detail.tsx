@@ -90,13 +90,12 @@ export function ProjectDetail({ project, currency }: { project: ProjectDetailDat
           )}
 
           {/* Full description */}
-          <section className="mt-14 max-w-2xl">
+          <section className="mt-14 w-full">
             <h2 className="text-2xl font-semibold">About this project</h2>
-            <div className="prose-content mt-5 space-y-4 text-[15px] leading-relaxed text-muted-foreground">
-              {project.fullDescription.split(/\n{2,}/).map((p, i) => (
-                <p key={i}>{p}</p>
-              ))}
-            </div>
+            <div
+              className="prose-content mt-5 text-[15.5px] leading-relaxed text-muted-foreground w-full max-w-none"
+              dangerouslySetInnerHTML={{ __html: project.fullDescription }}
+            />
           </section>
 
           {/* Reviews */}

@@ -42,8 +42,15 @@ const roleInput = z.object({
     .default([]),
 });
 const featureInput = z.object({
-  title: z.string().trim().min(1).max(80),
-  description: z.string().trim().max(500).optional(),
+  groupName: z
+    .string()
+    .trim()
+    .max(60)
+    .transform((v) => (v === "" ? null : v))
+    .nullable()
+    .optional(),
+  title: z.string().trim().min(1).max(120),
+  description: z.string().trim().max(500).default(""),
   icon: optionalText(60),
 });
 // icon may be a lucide name or a full logo image URL snapshotted from the technology catalog
