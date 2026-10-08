@@ -52,16 +52,16 @@ export function DeviceShowcase({
         </div>
       )}
 
-      <div className={cn(showSwitch && "lg:grid lg:grid-cols-[minmax(0,1fr)_280px] lg:items-start lg:gap-8")}>
+      <div className="flex flex-col items-center lg:flex-row lg:items-start lg:justify-center lg:gap-8">
         {hasDesktop && (
-          <div className={cn(active === "desktop" ? "block" : "hidden", "lg:block")}>
+          <div className={cn(active === "desktop" ? "block" : "hidden", "w-full lg:block lg:w-auto")}>
             <ScreenshotCarousel images={desktop} device="desktop" autoplay={autoplay} priority={priority} />
           </div>
         )}
         {hasMobile && (
           <div className={cn(active === "mobile" ? "block" : "hidden", "lg:block")}>
             <ScreenshotCarousel images={mobile} device="mobile" autoplay={autoplay} priority={priority} />
-          </div>
+         </div>
         )}
       </div>
     </div>

@@ -12,7 +12,7 @@ export function MonitorFrame({
 }) {
   return (
     <div className={cn("w-full", className)}>
-      <div className="rounded-t-lg border border-b-0 border-border bg-muted px-3 py-2">
+      <div className="rounded-t-lg border border-b-0 border-border bg-black px-3 py-2">
         <div className="flex items-center gap-1.5">
           <span className="size-2 rounded-full bg-border" />
           <span className="size-2 rounded-full bg-border" />

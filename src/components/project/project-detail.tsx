@@ -14,7 +14,7 @@ import type { ProjectDetailData } from "@/types/api";
 
 export function ProjectDetail({ project, currency }: { project: ProjectDetailData; currency: string }) {
   return (
-    <article className="pb-16 lg:pb-20 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mt-4 sm:mt-6">
+    <article className="pb-16 lg:pb-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4 sm:mt-6">
       <div className="flex flex-col min-w-0">
           {/* Header */}
           <header>

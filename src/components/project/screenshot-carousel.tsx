@@ -11,11 +11,21 @@ import { cn } from "@/lib/utils";
 export type ScreenshotImage = { url: string; alt: string };
 export type Device = "desktop" | "mobile";
 
-/** Same screen height for both frames so desktop + mobile line up side by side. */
-const SCREEN_HEIGHT = "h-[420px] sm:h-[480px] lg:h-[560px]";
+/** Screen shape. Height comes from the width, so no calc() is needed. */
+const SCREEN_CLASS: Record<Device, string> = {
+  desktop: "aspect-[2.1]",   // was aspect-video (16:9)
+  mobile: "aspect-[0.457]",
+};
+
+/** Outer frame width (screen + bezel). Screen heights stay about equal: 
+ *  desktop (W-2)*9/16, phone (W-28)/0.457 */
+const FRAME_WIDTH: Record<Device, string> = {
+  desktop: "w-full lg:w-[758px] xl:w-[926px]",   // screen ≈ 756×360 / 924×440 at 2.1:1
+  mobile: "w-[170px] sm:w-[185px] lg:w-[193px] xl:w-[229px]",
+};
 
 const IMAGE_DIMENSIONS: Record<Device, { width: number; height: number; sizes: string }> = {
-  desktop: { width: 1440, height: 4000, sizes: "(min-width: 1024px) 800px, 100vw" },
+  desktop: { width: 1440, height: 4000, sizes: "(min-width: 1280px) 926px, (min-width: 1024px) 758px, 100vw" },
   mobile: { width: 390, height: 4200, sizes: "280px" },
 };
 
@@ -64,7 +74,7 @@ export function ScreenshotCarousel({
   const Frame = device === "desktop" ? MonitorFrame : PhoneFrame;
 
   const viewport = (
-    <div className="h-full overflow-hidden" ref={emblaRef}>
+    <div className={cn("h-full overflow-hidden", device === "mobile" && "bg-white pt-4 no-scrollbar")} ref={emblaRef}>
       <div className="flex h-full">
         {images.map((img, i) => (
           <div
@@ -90,12 +100,12 @@ export function ScreenshotCarousel({
 
   return (
     <div
-      className={cn("flex min-w-0 flex-col", className)}
+      className={cn("flex min-w-0 max-w-full shrink-0 flex-col", FRAME_WIDTH[device], className)}
       role="group"
       aria-roledescription="carousel"
       aria-label={device === "desktop" ? "Desktop screenshots" : "Mobile screenshots"}
     >
-      <Frame screenClassName={SCREEN_HEIGHT}>{viewport}</Frame>
+      <Frame screenClassName={SCREEN_CLASS[device]}>{viewport}</Frame>
 
       {multiple && (
         <div className="mt-4 flex items-center justify-center gap-3">
