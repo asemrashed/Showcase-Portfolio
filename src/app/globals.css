@@ -3,7 +3,7 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 /* ───────── Design tokens ─────────
-   Neutral grays + one violet accent (#7c3aed). Every color, radius and
+   Neutral grays + one teal accent (#06a999). Every color, radius and
    rhythm value in the UI comes from here — never hard-coded in components. */
 :root {
   --background: #fafafa;
@@ -15,12 +15,12 @@
   --border: #e4e4e7;
   --input: #d4d4d8;
 
-  --primary: #7c3aed;
+  --primary: #06a999;
   --primary-foreground: #ffffff;
-  --primary-hover: #6d28d9;
-  --primary-soft: #f1eafe;
-  --primary-text: #6d28d9;
-  --ring: #7c3aed;
+  --primary-hover: #058f82;
+  --primary-soft: #e6f7f5;
+  --primary-text: #058f82;
+  --ring: #06a999;
 
   --danger: #b91c1c;
   --danger-soft: #fef2f2;
@@ -38,12 +38,12 @@
   --border: #2e2e34;
   --input: #3f3f46;
 
-  --primary: #7c3aed;
+  --primary: #06a999;
   --primary-foreground: #ffffff;
-  --primary-hover: #8b5cf6;
-  --primary-soft: #241a3d;
-  --primary-text: #a78bfa;
-  --ring: #a78bfa;
+  --primary-hover: #08c4b1;
+  --primary-soft: #0a2e2b;
+  --primary-text: #5eead4;
+  --ring: #5eead4;
 
   --danger: #f87171;
   --danger-soft: #2a1515;

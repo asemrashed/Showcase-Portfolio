@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { Github, Linkedin, Twitter, Dribbble, Globe } from "lucide-react";
 import { Container } from "@/components/ui/container";
-import { NAV_LINKS } from "@/lib/site";
+import { DEFAULT_SITE_NAME, NAV_LINKS } from "@/lib/site";
 import type { SettingsData, ContactInfoData } from "@/types/api";
+import { SiteLogo } from "./site-logo";
 
 const SOCIAL_ICON: Record<string, typeof Globe> = {
   github: Github,
@@ -14,14 +15,19 @@ const SOCIAL_ICON: Record<string, typeof Globe> = {
 
 export function Footer({ settings, contactInfo }: { settings: SettingsData | null; contactInfo: ContactInfoData | null }) {
   const year = new Date().getFullYear();
-  const siteName = settings?.siteName ?? "Project Showcase";
+  const siteName = settings?.siteName ?? DEFAULT_SITE_NAME;
   const socials = settings?.socials?.length ? settings.socials : contactInfo?.socials ?? [];
 
   return (
     <footer className="border-t border-border">
       <Container className="flex flex-col gap-10 py-14 sm:flex-row sm:justify-between">
         <div className="max-w-sm">
-          <span className="font-display text-lg font-semibold">{siteName}</span>
+          <SiteLogo
+            siteName={siteName}
+            logoUrl={settings?.logoUrl}
+            logoDarkUrl={settings?.logoDarkUrl}
+            showSiteName={settings?.showSiteName}
+          />
           <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
             {settings?.footerText ?? settings?.tagline ?? "Software we've built, shown properly."}
           </p>

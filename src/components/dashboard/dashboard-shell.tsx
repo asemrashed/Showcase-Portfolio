@@ -8,12 +8,18 @@ export function DashboardShell({
   name,
   email,
   siteName,
+  logoUrl,
+  logoDarkUrl,
+  showSiteName,
   children,
 }: {
   role: UserRole;
   name: string | null;
   email: string;
   siteName: string;
+  logoUrl?: string | null;
+  logoDarkUrl?: string | null;
+  showSiteName?: boolean;
   children: ReactNode;
 }) {
   return (
@@ -24,7 +30,13 @@ export function DashboardShell({
       >
         Skip to main content
       </a>
-      <DashboardSidebar role={role} siteName={siteName} />
+      <DashboardSidebar
+        role={role}
+        siteName={siteName}
+        logoUrl={logoUrl}
+        logoDarkUrl={logoDarkUrl}
+        showSiteName={showSiteName}
+      />
       <div className="flex h-dvh min-w-0 flex-1 flex-col overflow-y-auto thin-scroll">
         <DashboardTopbar name={name} email={email} role={role} />
         <main id="dashboard-main" className="flex-1 px-4 py-6 sm:px-6 sm:py-8">

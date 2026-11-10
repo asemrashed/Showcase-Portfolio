@@ -258,6 +258,8 @@ export const getSettings = unstable_cache(
       siteName: s.siteName,
       tagline: s.tagline,
       logoUrl: s.logoUrl,
+      logoDarkUrl: s.logoDarkUrl,
+      showSiteName: s.showSiteName,
       defaultOgImage: s.defaultOgImageUrl,
       currency: s.currency,
       footerText: s.footerText,

@@ -24,7 +24,7 @@ export default async function AboutPage() {
     <Section className="pt-14 sm:pt-16">
       <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:items-center lg:gap-16">
         {about.image ? (
-          <div className="relative aspect-[5/4] w-full overflow-hidden rounded-[var(--radius-2xl)] bg-muted">
+          <div className="relative aspect-[5/7] w-full max-w-md mx-auto overflow-hidden rounded-[var(--radius-2xl)] bg-muted lg:mx-0">
             <Image src={about.image.url} alt={about.image.alt} fill sizes="(min-width: 1024px) 45vw, 90vw" priority className="object-cover" />
           </div>
         ) : null}

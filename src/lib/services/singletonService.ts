@@ -66,7 +66,7 @@ export const getSettings = () =>
   db.siteSettings.upsert({ where: { id: ID }, update: {}, create: { id: ID, socials: [] } });
 
 export async function updateSettings(actor: Actor, input: SiteSettingsInput) {
-  uploads.assertAssets([input.logo, input.defaultOgImage]);
+  uploads.assertAssets([input.logo, input.logoDark, input.defaultOgImage]);
   const existing = await getSettings();
   const row = await db.$transaction(async (tx) => {
     const r = await tx.siteSettings.update({
@@ -76,6 +76,9 @@ export async function updateSettings(actor: Actor, input: SiteSettingsInput) {
         tagline: input.tagline ?? null,
         logoUrl: input.logo?.url ?? null,
         logoKey: input.logo?.key ?? null,
+        logoDarkUrl: input.logoDark?.url ?? null,
+        logoDarkKey: input.logoDark?.key ?? null,
+        showSiteName: input.showSiteName ?? false,
         defaultOgImageUrl: input.defaultOgImage?.url ?? null,
         defaultOgImageKey: input.defaultOgImage?.key ?? null,
         currency: input.currency,
@@ -86,6 +89,7 @@ export async function updateSettings(actor: Actor, input: SiteSettingsInput) {
     });
     const stale = [
       existing.logoKey !== (input.logo?.key ?? null) ? existing.logoKey : null,
+      existing.logoDarkKey !== (input.logoDark?.key ?? null) ? existing.logoDarkKey : null,
       existing.defaultOgImageKey !== (input.defaultOgImage?.key ?? null) ? existing.defaultOgImageKey : null,
     ];
     await uploads.queueDeletion(tx, stale);

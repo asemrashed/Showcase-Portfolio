@@ -6,6 +6,7 @@ import type { UserRole } from "@prisma/client";
 import { useDashboardUIStore } from "@/stores/dashboard-ui-store";
 import { navForRole } from "@/lib/dashboard-nav";
 import { cn } from "@/lib/utils";
+import { SiteLogo } from "@/components/layout/site-logo";
 
 function NavLinks({ role, collapsed, onNavigate }: { role: UserRole; collapsed: boolean; onNavigate?: () => void }) {
   const pathname = usePathname();
@@ -37,7 +38,19 @@ function NavLinks({ role, collapsed, onNavigate }: { role: UserRole; collapsed: 
   );
 }
 
-export function DashboardSidebar({ role, siteName }: { role: UserRole; siteName: string }) {
+export function DashboardSidebar({
+  role,
+  siteName,
+  logoUrl,
+  logoDarkUrl,
+  showSiteName,
+}: {
+  role: UserRole;
+  siteName: string;
+  logoUrl?: string | null;
+  logoDarkUrl?: string | null;
+  showSiteName?: boolean;
+}) {
   const { sidebarCollapsed, toggleSidebar, mobileSidebarOpen, setMobileSidebarOpen } = useDashboardUIStore();
 
   return (
@@ -50,7 +63,17 @@ export function DashboardSidebar({ role, siteName }: { role: UserRole; siteName:
         )}
       >
         <div className={cn("flex h-16 shrink-0 items-center border-b border-border px-4", sidebarCollapsed && "justify-center px-0")}>
-          {!sidebarCollapsed && <Link href="/dashboard" className="truncate font-display text-base font-semibold">{siteName}</Link>}
+          {sidebarCollapsed ? (
+            <SiteLogo href="/dashboard" siteName={siteName} collapsed />
+          ) : (
+            <SiteLogo
+              href="/dashboard"
+              siteName={siteName}
+              logoUrl={logoUrl}
+              logoDarkUrl={logoDarkUrl}
+              showSiteName={showSiteName}
+            />
+          )}
         </div>
         <NavLinks role={role} collapsed={sidebarCollapsed} />
         <div className="border-t border-border p-2.5">
@@ -75,7 +98,13 @@ export function DashboardSidebar({ role, siteName }: { role: UserRole; siteName:
           <div className="absolute inset-0 bg-black/40" onClick={() => setMobileSidebarOpen(false)} aria-hidden />
           <aside className="absolute inset-y-0 left-0 flex w-72 flex-col bg-surface shadow-xl">
             <div className="flex h-16 shrink-0 items-center justify-between border-b border-border px-4">
-              <span className="font-display text-base font-semibold">{siteName}</span>
+              <SiteLogo
+                href="/dashboard"
+                siteName={siteName}
+                logoUrl={logoUrl}
+                logoDarkUrl={logoDarkUrl}
+                showSiteName={showSiteName}
+              />
               <button
                 type="button"
                 aria-label="Close menu"

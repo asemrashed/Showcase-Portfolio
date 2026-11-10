@@ -11,13 +11,13 @@ export function AboutTeaser({ about }: { about: AboutData }) {
 
   return (
     <Section className="border-t border-border">
-      <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-2 lg:gap-16">
+      <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-5 lg:gap-14">
         {about.image ? (
-          <div className="relative order-1 aspect-[5/4] w-full overflow-hidden rounded-[var(--radius-2xl)] bg-muted lg:order-none">
-            <Image src={about.image.url} alt={about.image.alt} fill sizes="(min-width: 1024px) 45vw, 90vw" className="object-cover" />
+          <div className="relative order-1 aspect-[5/7] w-full max-w-sm mx-auto overflow-hidden rounded-[var(--radius-2xl)] bg-muted lg:order-none lg:col-span-2 lg:mx-0">
+            <Image src={about.image.url} alt={about.image.alt} fill sizes="(min-width: 1024px) 40vw, 90vw" className="object-cover" />
           </div>
         ) : null}
-        <div className={about.image ? "" : "mx-auto max-w-2xl text-center lg:col-span-2"}>
+        <div className={about.image ? "lg:col-span-3" : "mx-auto max-w-2xl text-center lg:col-span-5"}>
           <p className="mb-3 text-sm font-medium text-primary-text">About us</p>
           <h2 className="text-3xl font-semibold sm:text-4xl">{about.title}</h2>
           <p className="mt-4 text-base leading-relaxed text-muted-foreground">{intro}</p>

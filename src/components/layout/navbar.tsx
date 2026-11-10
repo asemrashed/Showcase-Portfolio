@@ -7,17 +7,26 @@ import { NAV_LINKS, isActivePath } from "@/lib/site";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "./theme-toggle";
 import { MobileMenu } from "./mobile-menu";
+import { SiteLogo } from "./site-logo";
 
-export function Navbar({ siteName }: { siteName: string }) {
+export function Navbar({
+  siteName,
+  logoUrl,
+  logoDarkUrl,
+  showSiteName,
+}: {
+  siteName: string;
+  logoUrl?: string | null;
+  logoDarkUrl?: string | null;
+  showSiteName?: boolean;
+}) {
   const pathname = usePathname();
   const { setMobileMenuOpen } = useUIStore();
 
   return (
     <header className="sticky top-0 z-30 border-b border-border/80 bg-background/85 backdrop-blur supports-[backdrop-filter]:bg-background/70">
       <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-5 sm:px-8">
-        <Link href="/" className="font-display text-lg font-semibold tracking-tight">
-          {siteName}
-        </Link>
+        <SiteLogo siteName={siteName} logoUrl={logoUrl} logoDarkUrl={logoDarkUrl} showSiteName={showSiteName} />
 
         <nav className="hidden items-center gap-1 md:flex">
           {NAV_LINKS.map((link) => (

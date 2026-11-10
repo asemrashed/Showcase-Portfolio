@@ -344,10 +344,13 @@ model AuditLog {
 /// Singleton (id = "singleton")
 model SiteSettings {
   id                 String   @id @default("singleton")
-  siteName           String   @default("Project Showcase")
+  siteName           String   @default("ByteNex Solutions")
   tagline            String?
   logoUrl            String?
   logoKey            String?
+  logoDarkUrl        String?
+  logoDarkKey        String?
+  showSiteName       Boolean  @default(false)
   defaultOgImageUrl  String?
   defaultOgImageKey  String?
   currency           String   @default("USD")

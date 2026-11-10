@@ -35,6 +35,8 @@ export const siteSettingsSchema = z
     siteName: z.string().trim().min(1).max(80),
     tagline: optionalText(200),
     logo: assetRefSchema.nullable().optional(),
+    logoDark: assetRefSchema.nullable().optional(),
+    showSiteName: z.boolean().optional().default(false),
     defaultOgImage: assetRefSchema.nullable().optional(),
     currency: z.string().trim().toUpperCase().length(3).default("USD"),
     footerText: optionalText(300),

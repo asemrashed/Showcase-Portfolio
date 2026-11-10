@@ -30,7 +30,10 @@ export default function SettingsPage() {
     control,
     reset,
     formState: { errors, isSubmitting, isDirty },
-  } = useForm<SiteSettingsInput>({ resolver: formResolver<SiteSettingsInput>(siteSettingsSchema), defaultValues: { socials: [] } });
+  } = useForm<SiteSettingsInput>({
+    resolver: formResolver<SiteSettingsInput>(siteSettingsSchema),
+    defaultValues: { socials: [], showSiteName: false },
+  });
 
   useEffect(() => {
     if (settings) {
@@ -40,13 +43,16 @@ export default function SettingsPage() {
         currency: settings.currency,
         footerText: settings.footerText ?? "",
         contactNotifyEmail: settings.contactNotifyEmail ?? "",
-        logo: settings.logoUrl ? { url: settings.logoUrl, key: settings.logoKey! } : null,
+        logo: settings.logoUrl && settings.logoKey ? { url: settings.logoUrl, key: settings.logoKey } : null,
+        logoDark: settings.logoDarkUrl && settings.logoDarkKey ? { url: settings.logoDarkUrl, key: settings.logoDarkKey } : null,
+        showSiteName: settings.showSiteName ?? false,
         socials: settings.socials as { platform: string; url: string }[],
       });
     }
   }, [settings, reset]);
 
   const logo = watch("logo") as { url: string; key: string } | null | undefined;
+  const logoDark = watch("logoDark") as { url: string; key: string } | null | undefined;
 
   const mutation = useMutation({
     mutationFn: async (data: SiteSettingsInput) => unwrap(await updateSettingsAction(data)),
@@ -63,23 +69,49 @@ export default function SettingsPage() {
   return (
     <Card className="max-w-2xl p-6">
       <form onSubmit={handleSubmit((d) => mutation.mutate(d))} noValidate className="flex flex-col gap-5">
-        <FormField label="Logo" htmlFor="settings-logo" optional>
-          <ImageUploader
-            value={logo ? { ...logo, alt: "" } : null}
-            onChange={(v) => setValue("logo", v ? { url: v.url, key: v.key } : null, { shouldDirty: true })}
-            folder="settings"
-            aspect="aspect-square max-w-32"
-            altRequired={false}
-          />
-        </FormField>
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+          <FormField label="Logo (light mode)" htmlFor="settings-logo" optional>
+            <ImageUploader
+              value={logo ? { ...logo, alt: "" } : null}
+              onChange={(v) => setValue("logo", v ? { url: v.url, key: v.key } : null, { shouldDirty: true })}
+              folder="settings"
+              aspect="aspect-[3/1] max-w-56"
+              altRequired={false}
+            />
+            <p className="mt-1.5 text-xs text-muted-foreground">Wordmark for light backgrounds. Leave empty to use the default.</p>
+          </FormField>
+          <FormField label="Logo (dark mode)" htmlFor="settings-logo-dark" optional>
+            <ImageUploader
+              value={logoDark ? { ...logoDark, alt: "" } : null}
+              onChange={(v) => setValue("logoDark", v ? { url: v.url, key: v.key } : null, { shouldDirty: true })}
+              folder="settings"
+              aspect="aspect-[3/1] max-w-56"
+              altRequired={false}
+            />
+            <p className="mt-1.5 text-xs text-muted-foreground">Wordmark for dark backgrounds. Leave empty to use the default.</p>
+          </FormField>
+        </div>
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
           <FormField label="Site name" htmlFor="settings-name" error={errors.siteName?.message}>
             <Input id="settings-name" aria-invalid={!!errors.siteName} {...register("siteName")} />
+            <p className="mt-1.5 text-xs text-muted-foreground">Used for SEO, alt text, and copyright — even if the title is hidden.</p>
           </FormField>
           <FormField label="Currency" htmlFor="settings-currency" error={errors.currency?.message}>
             <Input id="settings-currency" placeholder="USD" {...register("currency")} />
           </FormField>
         </div>
+        <label htmlFor="settings-show-name" className="flex items-start gap-3 rounded-[var(--radius-md)] border border-border px-3.5 py-3">
+          <input
+            id="settings-show-name"
+            type="checkbox"
+            className="mt-0.5 size-4 rounded border-input accent-[var(--primary)]"
+            {...register("showSiteName")}
+          />
+          <span>
+            <span className="block text-sm font-medium">Show site name next to logo</span>
+            <span className="mt-0.5 block text-xs text-muted-foreground">Off by default. The logo image already includes the wordmark.</span>
+          </span>
+        </label>
         <FormField label="Tagline" htmlFor="settings-tagline" error={errors.tagline?.message} optional>
           <Input id="settings-tagline" {...register("tagline")} />
         </FormField>

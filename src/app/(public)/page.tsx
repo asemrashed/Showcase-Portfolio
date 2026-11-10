@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { siteUrl } from "@/lib/site";
+import { DEFAULT_SITE_NAME, DEFAULT_TAGLINE, siteUrl } from "@/lib/site";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { HeroCarousel } from "@/components/home/hero-carousel";
@@ -21,7 +21,7 @@ import { load } from "@/lib/data";
 import { getHero, getCategories, getProjects, getReviews, getAbout } from "@/lib/queries/public";
 
 export const metadata: Metadata = {
-  title: "Project Showcase — software we've built, shown properly",
+  title: `${DEFAULT_SITE_NAME} — ${DEFAULT_TAGLINE.toLowerCase()}`,
   alternates: { canonical: siteUrl },
 };
 

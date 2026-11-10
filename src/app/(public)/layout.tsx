@@ -3,6 +3,7 @@ import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 import { getSettings, getContactInfo } from "@/lib/queries/public";
 import { load } from "@/lib/data";
+import { DEFAULT_SITE_NAME } from "@/lib/site";
 
 export default async function PublicLayout({ children, modal }: { children: ReactNode; modal: ReactNode }) {
   const [settings, contactInfo] = await Promise.all([
@@ -18,7 +19,12 @@ export default async function PublicLayout({ children, modal }: { children: Reac
       >
         Skip to main content
       </a>
-      <Navbar siteName={settings?.siteName ?? "Project Showcase"} />
+      <Navbar
+        siteName={settings?.siteName ?? DEFAULT_SITE_NAME}
+        logoUrl={settings?.logoUrl}
+        logoDarkUrl={settings?.logoDarkUrl}
+        showSiteName={settings?.showSiteName}
+      />
       <main id="main-content" className="flex-1">
         {children}
       </main>

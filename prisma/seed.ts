@@ -38,7 +38,7 @@ async function main() {
   await db.siteSettings.upsert({
     where: { id: "singleton" },
     update: {},
-    create: { id: "singleton", siteName: "Project Showcase", tagline: "Software we've built, shown properly.", currency: "USD", socials: [] },
+    create: { id: "singleton", siteName: "ByteNex Solutions", tagline: "Software we've built, shown properly.", currency: "USD", socials: [], showSiteName: false },
   });
   await db.aboutSection.upsert({
     where: { id: "singleton" },
